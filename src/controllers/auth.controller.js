@@ -1,6 +1,7 @@
 import { User } from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { userRoleEnum } from '../utils/constants.js';
 import { sendMail } from '../utils/sendMail.js';
 
@@ -8,7 +9,7 @@ export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    const userAlredyExist = await User.findOne({ email: email.toLocaleLowerCase() });
+    const userAlredyExist = await User.findOne({ email: email.toLowerCase() });
 
     if (userAlredyExist) {
       return res.status(400).json({
@@ -123,6 +124,97 @@ export const verifyUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Internal Server Error',
+    });
+  }
+};
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please Verified the account',
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Credentials',
+      });
+    }
+
+    const accessToken = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.ACCESSTOKEN_SECRET,
+      {
+        expiresIn: process.env.ACCESSTOKEN_EXPIRY,
+      },
+    );
+
+    const refreshToken = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.REFRESHTOKEN_SECRET,
+      {
+        expiresIn: process.env.REFRESHTOKEN_EXPIRY,
+      },
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    const accessCookieOptions = {
+      httpOnly: true,
+      sameSite: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+    };
+
+    const refreshCookieOptions = {
+      httpOnly: true,
+      sameSite: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    };
+
+    res.cookie('accessToken', accessToken, accessCookieOptions);
+    res.cookie('refreshToken', refreshToken, refreshCookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: 'Login Succesful',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: email,
+        role: user.role,
+        image: user.image,
+      },
+    });
+  } catch (error) {
+    console.error('Login Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When Login',
     });
   }
 };
