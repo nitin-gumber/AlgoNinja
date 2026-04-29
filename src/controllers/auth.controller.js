@@ -184,14 +184,14 @@ export const login = async (req, res) => {
 
     const accessCookieOptions = {
       httpOnly: true,
-      sameSite: true,
+      sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 15 * 60 * 1000, // 15 min
     };
 
     const refreshCookieOptions = {
       httpOnly: true,
-      sameSite: true,
+      sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
@@ -205,7 +205,7 @@ export const login = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: email,
+        email: user.email,
         role: user.role,
         image: user.image,
       },
@@ -215,6 +215,37 @@ export const login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Internal Server Error When Login',
+    });
+  }
+};
+
+
+// for testing perpose only, can be removed later
+export const checkUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        image: user.image,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
     });
   }
 };
