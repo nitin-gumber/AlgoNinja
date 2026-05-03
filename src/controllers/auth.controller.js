@@ -247,6 +247,48 @@ export const logout = async (req, res) => {
   }
 };
 
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid User!',
+      });
+    }
+
+    const resetPasswordToken = crypto.randomBytes(32).toString('hex');
+    const resetPasswordExpiry = Date.now() + 10 * 60 * 1000;
+
+    const resetLink = `${process.env.BASE_URL}/api/v1/auth/resetPassword/${resetPasswordToken}`;
+
+    await User.findOneAndUpdate(
+      { email: email },
+      {
+        passwordResetToken: resetPasswordToken,
+        passwordResetTokenExpiry: resetPasswordExpiry,
+      },
+    );
+
+    await sendMail({
+      to: user.email,
+      subject: 'AlgoNinja Reset Password Link',
+      message: resetLink,
+    });
+
+    return res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('forgetPassword Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When forgetPassword',
+    });
+  }
+};
+
 // for testing perpose only, can be removed later
 export const checkUserProfile = async (req, res) => {
   try {
