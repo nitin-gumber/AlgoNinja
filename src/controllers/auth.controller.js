@@ -219,6 +219,33 @@ export const login = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    await User.findByIdAndUpdate(id, { refreshToken: null });
+
+    const cookieOptions = {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    };
+
+    res.clearCookie('accessToken', cookieOptions);
+    res.clearCookie('refreshToken', cookieOptions);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out successfully!',
+    });
+  } catch (error) {
+    console.error('Logout Failed', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When Logged Out',
+    });
+  }
+};
 
 // for testing perpose only, can be removed later
 export const checkUserProfile = async (req, res) => {

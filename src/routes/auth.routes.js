@@ -1,6 +1,12 @@
 import express from 'express';
 import { userRegisterValidator, userLoginValidator } from '../validators/validate.js';
-import { register, verifyUser, login, checkUserProfile } from '../controllers/auth.controller.js';
+import {
+  register,
+  verifyUser,
+  login,
+  logout,
+  checkUserProfile,
+} from '../controllers/auth.controller.js';
 import { handleValidationErrors } from '../middlewares/handleValidationErrors.middleware.js';
 import { isAuthenticated } from '../middlewares/auth.middleware.js';
 
@@ -10,5 +16,6 @@ authRoutes.post('/register', userRegisterValidator(), handleValidationErrors, re
 authRoutes.get('/verifyUser/:verificationToken', verifyUser);
 authRoutes.post('/login', userLoginValidator(), handleValidationErrors, login);
 authRoutes.get('/userProfile', isAuthenticated, checkUserProfile); // for testing perpose only, can be removed later
+authRoutes.get('/logout', isAuthenticated, logout);
 
 export default authRoutes;
