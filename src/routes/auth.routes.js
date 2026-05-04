@@ -3,6 +3,7 @@ import {
   userRegisterValidator,
   userLoginValidator,
   userforgotPasswordValidator,
+  userresetPasswordValidator,
 } from '../validators/validate.js';
 import {
   register,
@@ -10,6 +11,7 @@ import {
   login,
   logout,
   forgotPassword,
+  resetPassword,
   checkUserProfile,
 } from '../controllers/auth.controller.js';
 import { handleValidationErrors } from '../middlewares/handleValidationErrors.middleware.js';
@@ -27,6 +29,12 @@ authRoutes.post(
   userforgotPasswordValidator(),
   handleValidationErrors,
   forgotPassword,
+);
+authRoutes.post(
+  '/resetPassword/:resetPasswordToken',
+  userresetPasswordValidator(),
+  handleValidationErrors,
+  resetPassword,
 );
 
 export default authRoutes;
