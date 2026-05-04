@@ -247,6 +247,119 @@ export const logout = async (req, res) => {
   }
 };
 
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid User!',
+      });
+    }
+
+    const resetPasswordToken = crypto.randomBytes(32).toString('hex');
+    const resetPasswordExpiry = Date.now() + 10 * 60 * 1000; // 10min
+
+    const resetLink = `${process.env.BASE_URL}/api/v1/auth/resetPassword/${resetPasswordToken}`;
+
+    await User.findOneAndUpdate(
+      { email: email },
+      {
+        passwordResetToken: resetPasswordToken,
+        passwordResetTokenExpiry: resetPasswordExpiry,
+      },
+    );
+
+    await sendMail({
+      to: user.email,
+      subject: 'Reset Password Link - AlgoNinjua',
+      message: resetLink,
+    });
+
+    return res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('forgetPassword Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When forgetPassword',
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { resetPasswordToken } = req.params;
+  const { newPassword } = req.body;
+
+  if (!resetPasswordToken) {
+    return res.status(400).json({
+      success: false,
+      message: 'Token not found',
+    });
+  }
+
+  try {
+    const user = await User.findOne({ passwordResetToken: resetPasswordToken });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or Expire Token',
+      });
+    }
+
+    if (user.passwordResetTokenExpiry < Date.now()) {
+      const newresetPasswordToken = crypto.randomBytes(32).toString('hex');
+      const newresetPasswordExpiry = Date.now() + 10 * 60 * 1000; // 10min
+
+      const resetLink = `${process.env.BASE_URL}/api/v1/auth/resetPassword/${newresetPasswordToken}`;
+
+      await User.findOneAndUpdate(
+        { email: user.email },
+        {
+          passwordResetToken: newresetPasswordToken,
+          passwordResetTokenExpiry: newresetPasswordExpiry,
+        },
+      );
+
+      await sendMail({
+        to: user.email,
+        subject: 'New Reset Password Link - AlgoNinja',
+        message: resetLink,
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: 'Token expired. A new verification email has been sent to your email address.',
+      });
+    }
+
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await User.findOneAndUpdate(
+      { email: user.email },
+      {
+        password: newHashedPassword,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+      },
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully',
+    });
+  } catch (error) {
+    console.error('resetPassword Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When resetPassword',
+    });
+  }
+};
+
 // for testing perpose only, can be removed later
 export const checkUserProfile = async (req, res) => {
   try {

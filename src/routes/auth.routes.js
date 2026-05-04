@@ -1,10 +1,17 @@
 import express from 'express';
-import { userRegisterValidator, userLoginValidator } from '../validators/validate.js';
+import {
+  userRegisterValidator,
+  userLoginValidator,
+  userforgotPasswordValidator,
+  userresetPasswordValidator,
+} from '../validators/validate.js';
 import {
   register,
   verifyUser,
   login,
   logout,
+  forgotPassword,
+  resetPassword,
   checkUserProfile,
 } from '../controllers/auth.controller.js';
 import { handleValidationErrors } from '../middlewares/handleValidationErrors.middleware.js';
@@ -17,5 +24,17 @@ authRoutes.get('/verifyUser/:verificationToken', verifyUser);
 authRoutes.post('/login', userLoginValidator(), handleValidationErrors, login);
 authRoutes.get('/userProfile', isAuthenticated, checkUserProfile); // for testing perpose only, can be removed later
 authRoutes.get('/logout', isAuthenticated, logout);
+authRoutes.post(
+  '/forgotPassword',
+  userforgotPasswordValidator(),
+  handleValidationErrors,
+  forgotPassword,
+);
+authRoutes.post(
+  '/resetPassword/:resetPasswordToken',
+  userresetPasswordValidator(),
+  handleValidationErrors,
+  resetPassword,
+);
 
 export default authRoutes;
