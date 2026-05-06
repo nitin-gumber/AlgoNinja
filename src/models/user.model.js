@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
+    googleId: {
+      type: String,
+    },
+
     plan: {
       type: String,
       enum: plans,
@@ -70,6 +74,10 @@ const userSchema = new mongoose.Schema(
     },
 
     planActivedAt: {
+      type: Date,
+    },
+
+    planExpiresAt: {
       type: Date,
     },
   },
