@@ -136,3 +136,30 @@ export const getAllProblems = async (req, res) => {
     });
   }
 };
+
+export const getProblemById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const problem = await Problem.findById(id);
+
+    if (!problem) {
+      return res.status(404).json({
+        success: false,
+        message: 'Problem not found.',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Problem Fetched Successfully',
+      problem,
+    });
+  } catch (error) {
+    console.error('getProblemById Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When get Problem by Id',
+    });
+  }
+};

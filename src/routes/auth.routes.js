@@ -24,6 +24,7 @@ authRoutes.get('/verifyUser/:verificationToken', verifyUser);
 authRoutes.post('/login', userLoginValidator(), handleValidationErrors, login);
 authRoutes.get('/userProfile', isAuthenticated, checkUserProfile); // for testing perpose only, can be removed later
 authRoutes.get('/logout', isAuthenticated, logout);
+
 authRoutes.post(
   '/forgotPassword',
   userforgotPasswordValidator(),
