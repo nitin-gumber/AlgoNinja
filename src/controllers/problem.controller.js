@@ -3,6 +3,8 @@ import { Problem } from '../models/problem.model.js';
 import { userRoleEnum } from '../utils/constants.js';
 import { getJudge0LanguageId, submitBatch, pollBatchResults } from '../utils/judge0.js';
 
+import mongoose from 'mongoose';
+
 export const createProblem = async (req, res) => {
   const {
     title,
@@ -114,8 +116,6 @@ export const getAllProblems = async (req, res) => {
   try {
     const problems = await Problem.find({});
 
-    console.log('Problems', problems);
-
     if (problems.length === 0) {
       return res.status(404).json({
         success: false,
@@ -166,8 +166,6 @@ export const getProblemById = async (req, res) => {
 
 export const updateProblem = async (req, res) => {
   const { id } = req.params;
-
-  console.log('Id', id);
 
   const {
     title,
@@ -266,6 +264,39 @@ export const updateProblem = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Internal Server Error update the Problem',
+    });
+  }
+};
+
+export const deleteProblem = async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user.role !== userRoleEnum.ADMIN) {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied! You are not allowed to delete a problem',
+    });
+  }
+
+  try {
+    const deleteProblem = await Problem.findByIdAndDelete(id);
+
+    if (!deleteProblem) {
+      return res.status(404).json({
+        success: false,
+        message: 'Problem not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Problem Deleted Successfully',
+    });
+  } catch (error) {
+    console.error('deleteProblem Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When deleted the Problem',
     });
   }
 };

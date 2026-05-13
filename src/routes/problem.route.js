@@ -8,6 +8,7 @@ import {
   getAllProblems,
   getProblemById,
   updateProblem,
+  deleteProblem,
 } from '../controllers/problem.controller.js';
 
 const problemRoutes = express.Router();
@@ -33,5 +34,7 @@ problemRoutes.put(
   checkAdmin,
   updateProblem,
 );
+
+problemRoutes.delete('/deleteProblem/:id', isAuthenticated, checkAdmin, deleteProblem);
 
 export default problemRoutes;
