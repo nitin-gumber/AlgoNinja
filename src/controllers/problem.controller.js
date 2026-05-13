@@ -109,3 +109,30 @@ export const createProblem = async (req, res) => {
     });
   }
 };
+
+export const getAllProblems = async (req, res) => {
+  try {
+    const problems = await Problem.find({});
+
+    console.log('Problems', problems);
+
+    if (problems.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Problems not found.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'All Problems Fetched Successfully',
+      problems,
+    });
+  } catch (error) {
+    console.error('getAllProblems Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When get All Problems',
+    });
+  }
+};
