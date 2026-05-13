@@ -81,3 +81,16 @@ export const createProblemValidator = () => {
     body('codeSnippets').notEmpty().withMessage('Code snippets are required'),
   ];
 };
+
+export const updateProblemValidator = () => {
+  return [
+    body('title').trim().notEmpty().withMessage('Title is required'),
+    body('description').trim().notEmpty().withMessage('Description is required'),
+    body('difficulty').trim().notEmpty().withMessage('Difficulty is required'),
+    body('tags').isArray().withMessage('Tags must be an array of strings'),
+    body('examples').notEmpty().withMessage('Examples are required'),
+    body('constraints').trim().notEmpty().withMessage('Constraints are required'),
+    body('testcases').notEmpty().withMessage('Testcases are required'),
+    body('codeSnippets').notEmpty().withMessage('Code snippets are required'),
+  ];
+};

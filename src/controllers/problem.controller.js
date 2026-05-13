@@ -163,3 +163,109 @@ export const getProblemById = async (req, res) => {
     });
   }
 };
+
+export const updateProblem = async (req, res) => {
+  const { id } = req.params;
+
+  console.log('Id', id);
+
+  const {
+    title,
+    description,
+    difficulty,
+    tags,
+    examples,
+    constraints,
+    hints,
+    editorial,
+    testcases,
+    codeSnippets,
+    referenceSolutions,
+  } = req.body;
+
+  if (req.user.role !== userRoleEnum.ADMIN) {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied! You are not allowed to update a problem',
+    });
+  }
+
+  try {
+    const problem = await Problem.findById(id);
+
+    if (!problem) {
+      return res.status(404).json({
+        success: false,
+        message: 'Problem Not Found',
+      });
+    }
+
+    for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
+      const languageId = getJudge0LanguageId(language);
+
+      if (!languageId) {
+        return res.status(400).json({
+          success: false,
+          message: `Language ${language} is not supported yet!`,
+        });
+      }
+
+      const submissions = testcases.map(({ input, output }) => ({
+        source_code: solutionCode,
+        language_id: languageId,
+        stdin: input,
+        expected_output: output,
+      }));
+
+      const submissionResults = await submitBatch(submissions);
+
+      const tokens = submissionResults.map((results) => results.token);
+
+      const results = await pollBatchResults(tokens);
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+
+        console.log(
+          `Testcase ${i + 1} for language ${language} ------ result ${JSON.stringify(result)} `,
+        );
+
+        if (result.status.id !== 3) {
+          return res.status(400).json({
+            success: false,
+            message: `Testcase ${i + 1} failed for language ${language}`,
+          });
+        }
+      }
+    }
+
+    const updatedProblem = await Problem.findByIdAndUpdate(
+      id,
+      {
+        title: title,
+        description: description,
+        difficulty: difficulty,
+        tags: tags,
+        examples: examples,
+        constraints: constraints,
+        hints: hints,
+        editorial: editorial,
+        testcases: testcases,
+        codeSnippets: codeSnippets,
+        referenceSolutions: referenceSolutions,
+      },
+      { new: true, runValidators: true },
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Problem Updated Successfully',
+    });
+  } catch (error) {
+    console.error('updateProblem Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error update the Problem',
+    });
+  }
+};
