@@ -85,3 +85,26 @@ export const isAuthenticated = async (req, res, next) => {
       .json({ success: false, message: 'Internal Server Error When Authenticating User' });
   }
 };
+
+export const checkAdmin = async (req, res, next) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findById(userId).select('role');
+
+    if (!user || user.role !== 'admin') {
+      return res.status(401).json({
+        success: false,
+        message: 'Access Denied! Admins Only Allowed',
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error('checkAdmin Middleware Failed: ', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When checkAdmin Middlware',
+    });
+  }
+};
