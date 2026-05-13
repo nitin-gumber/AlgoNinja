@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import { connectDB } from './utils/dbConnect.js';
 
 import userAuthRoutes from './routes/auth.routes.js';
+import problemRoutes from './routes/problem.route.js';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', userAuthRoutes);
+app.use('/api/v1/problems', problemRoutes);
 
 (async () => {
   try {

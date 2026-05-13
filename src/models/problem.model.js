@@ -1,14 +1,16 @@
 import mongoose from 'mongoose';
-import { availableDifficulties, difficultyEnum } from '../utils/constants';
+import { availableDifficulties, difficultyEnum } from '../utils/constants.js';
 
 const problemSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
+      unique: true,
       minLength: 3,
       maxLength: 100,
       trim: true,
+      lowercase: true,
     },
 
     description: {
@@ -53,10 +55,12 @@ const problemSchema = new mongoose.Schema(
       trim: true,
     },
 
-    testcases: {
-      type: mongoose.Schema.Types.Mixed,
-      required: true,
-    },
+    testcases: [
+      {
+        input: { type: String, required: true },
+        output: { type: String, required: true },
+      },
+    ],
 
     codeSnippets: {
       type: mongoose.Schema.Types.Mixed,

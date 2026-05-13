@@ -1,6 +1,7 @@
 import { User } from '../models/user.model.js';
 import { Problem } from '../models/problem.model.js';
-import { difficultyEnum } from '../utils/constants.js';
+import { userRoleEnum } from '../utils/constants.js';
+import { getJudge0LanguageId, submitBatch, pollBatchResults } from '../utils/judge0.js';
 
 export const createProblem = async (req, res) => {
   const {
@@ -17,13 +18,94 @@ export const createProblem = async (req, res) => {
     referenceSolutions,
   } = req.body;
 
-  if (req.user.role !== difficultyEnum.ADMIN) {
+  if (req.user.role !== userRoleEnum.ADMIN) {
     return res.status(403).json({
       success: false,
       message: 'Access denied! Only admins can create problems.',
     });
   }
 
+  try {
+    const existingProblem = await Problem.findOne({ title: title.toLowerCase().trim() });
+    if (existingProblem) {
+      return res.status(400).json({
+        success: false,
+        message: 'Problem with this title already exists!',
+      });
+    }
 
+    for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
+      const languageId = getJudge0LanguageId(language);
 
+      if (!languageId) {
+        return res.status(400).json({
+          success: false,
+          message: `Language ${language} is not supported yet!`,
+        });
+      }
+
+      const submissions = testcases.map(({ input, output }) => ({
+        source_code: solutionCode,
+        language_id: languageId,
+        stdin: input,
+        expected_output: output,
+      }));
+
+      const submissionResults = await submitBatch(submissions);
+
+      const tokens = submissionResults.map((results) => results.token);
+
+      const results = await pollBatchResults(tokens);
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+
+        console.log(
+          `Testcase ${i + 1} for language ${language} ------ result ${JSON.stringify(result)} `,
+        );
+
+        if (result.status.id !== 3) {
+          return res.status(400).json({
+            success: false,
+            message: `Testcase ${i + 1} failed for language ${language}`,
+          });
+        }
+      }
+    }
+
+    const newProblem = await Problem.create({
+      title: title,
+      description: description,
+      difficulty: difficulty,
+      tags: tags,
+      examples: examples,
+      constraints: constraints,
+      hints: hints,
+      editorial: editorial,
+      testcases: testcases,
+      codeSnippets: codeSnippets,
+      referenceSolutions: referenceSolutions,
+      problemCreatedBy: req.user.id,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Problem Created Successfully',
+      problem: newProblem,
+    });
+  } catch (error) {
+    console.error('createProblem Failed: ', error);
+
+    if (error.message === 'Judge0 polling timed out') {
+      return res.status(408).json({
+        success: false,
+        message: 'Judge0 server is taking too long to respond. Please try again after some time.',
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error When create Problem',
+    });
+  }
 };

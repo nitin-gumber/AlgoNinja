@@ -86,7 +86,7 @@ export const isAuthenticated = async (req, res, next) => {
   }
 };
 
-export const checkAdmin = async (req, res) => {
+export const checkAdmin = async (req, res, next) => {
   const userId = req.user.id;
 
   try {
