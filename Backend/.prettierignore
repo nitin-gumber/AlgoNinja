@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+dist/
+build/
+out/
+
+# Version Control
+.git/
+.svn/
+.hg/
+
+# Coverage reports (Testing)
+coverage/
+*.lcov
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS related files
+.DS_Store
+Thumbs.db
+
+# Project-specific artifacts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Static files & Assets (Images, Fonts, etc.)
+public/
+assets/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.pdf
+
+# Lock files (Inhe manual format nahi karte)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
