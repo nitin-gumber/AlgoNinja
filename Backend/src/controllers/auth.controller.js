@@ -63,7 +63,7 @@ export const register = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'User registered successfully. Please check your email to verify your account.',
+      message: 'ser reUgistered successfully. Please check your email to verify your account.',
       user: {
         id: user.id,
         email: user.email,
@@ -129,10 +129,7 @@ export const verifyUser = async (req, res) => {
     user.verificationTokenExpiry = undefined;
     await user.save();
 
-    res.status(200).json({
-      success: true,
-      message: 'Login Successfully',
-    });
+    return res.redirect(`${process.env.FRONTEND_URL}/login`);
   } catch (error) {
     console.error('VerifyUser Error: ', error);
     return res.status(500).json({
@@ -382,8 +379,7 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// for testing perpose only, can be removed later
-export const checkUserProfile = async (req, res) => {
+export const check = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
@@ -400,14 +396,14 @@ export const checkUserProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        image: user.image,
+        image: user?.image,
       },
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error',
+      message: 'Internal Server Error When Checking' || error.message,
     });
   }
 };

@@ -13,7 +13,7 @@ import {
   logout,
   forgotPassword,
   resetPassword,
-  checkUserProfile,
+  check,
   googleCallback,
 } from '../controllers/auth.controller.js';
 import { handleValidationErrors } from '../middlewares/handleValidationErrors.middleware.js';
@@ -24,7 +24,7 @@ const authRoutes = express.Router();
 authRoutes.post('/register', userRegisterValidator(), handleValidationErrors, register);
 authRoutes.get('/verifyUser/:verificationToken', verifyUser);
 authRoutes.post('/login', userLoginValidator(), handleValidationErrors, login);
-authRoutes.get('/userProfile', isAuthenticated, checkUserProfile); // for testing perpose only, can be removed later
+authRoutes.get('/check', isAuthenticated, check);
 authRoutes.get('/logout', isAuthenticated, logout);
 
 authRoutes.post(
