@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import cors from "cors"
 import { connectDB } from './utils/dbConnect.js';
 
 import userAuthRoutes from './routes/auth.routes.js';
@@ -19,6 +20,16 @@ dotenv.config();
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+
+const corsOptions = {
+  origin: 'http://localhost:5173', // Allow only your frontend origin
+  credentials: true,               // Allow cookies/authorization headers if needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());

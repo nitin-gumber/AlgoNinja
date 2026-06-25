@@ -48,7 +48,7 @@ export const register = async (req, res) => {
       });
     }
 
-    const emailVerificationLink = `${process.env.BASE_URL}/api/v1/auth/verifyuser/${verficationToken}`;
+    const emailVerificationLink = `${process.env.BASE_URL}/api/v1/auth/verifyUser/${verficationToken}`;
 
     try {
       await sendMail({
@@ -63,7 +63,7 @@ export const register = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'ser reUgistered successfully. Please check your email to verify your account.',
+      message: 'User Registered successfully. Please check your email to verify your account.',
       user: {
         id: user.id,
         email: user.email,
@@ -94,7 +94,7 @@ export const verifyUser = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'User not found',
+        message: 'User already email verify. Please Login Now!',
       });
     }
 

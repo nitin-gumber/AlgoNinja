@@ -6,8 +6,8 @@ export const userRegisterValidator = () => {
       .trim()
       .notEmpty()
       .withMessage('Name is required')
-      .isLength({ min: 3, max: 50 })
-      .withMessage('Name must be 3-50 characters'),
+      .isLength({ min: 1, max: 50 })
+      .withMessage('Name must be 1-50 characters'),
     ,
     body('email')
       .trim()

@@ -1,7 +1,6 @@
 import { toast } from "sonner";
 import { axiosClient } from "../utils/axiosClient";
 import { create } from "zustand";
-import authRoutes from "../../../Backend/src/routes/auth.routes";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
@@ -23,7 +22,7 @@ export const useAuthStore = create((set) => ({
       const errorMsg =
         error.response.data?.message ||
         "Invalid Token, Please try again later!";
-      ste({ authUser: null, isAuthenticated: false });
+      set({ authUser: null, isAuthenticated: false });
       return { success: false };
     } finally {
       set({ isCheckAuth: false });
@@ -43,7 +42,7 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       console.error("Error When User register", error);
       const errorMsg =
-        error.response.data?.message || "Registration pipeline block";
+        error.response?.data?.message || "Registration failed. Try again.";
       toast.error(errorMsg);
       return { success: false };
     } finally {
@@ -52,7 +51,7 @@ export const useAuthStore = create((set) => ({
   },
 
   login: async (userData) => {
-    set({ isLogginIn: true });
+    set({ isLoggingIn: true });
     try {
       const response = await axiosClient.post("/auth/login", userData);
       set({ authUser: response.data?.user, isAuthenticated: true });
@@ -67,7 +66,7 @@ export const useAuthStore = create((set) => ({
       toast.error(errorMsg);
       return { success: false };
     } finally {
-      set({ isLogginIn: false });
+      set({ isLoggingIn: false });
     }
   },
 
