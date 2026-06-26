@@ -112,7 +112,7 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await axiosClient.post(
         `/auth/resetPassword/${token}`,
-        newPassword,
+        {newPassword},
       );
       toast.success(
         response.data?.message || "Password updated successfully!",

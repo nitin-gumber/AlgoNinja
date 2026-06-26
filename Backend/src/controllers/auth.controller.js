@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { userRoleEnum } from '../utils/constants.js';
 import { sendMail } from '../utils/sendMail.js';
 import { sendVerificationEmailTemplate } from '../templates/sendVerificationEmailTemplate.js';
+import { sendForgotPasswordEmailTemplate } from '../templates/sendForgotPasswordEmailTemplate.js';
 
 export const register = async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -54,7 +55,6 @@ export const register = async (req, res) => {
       await sendMail({
         to: user.email,
         subject: 'Verify Your AlgoNinja Account 🚀',
-        // message: `Hi ${user.name}, please verify your AlgoNinja account using this link: ${emailVerificationLink}`,
         htmlMessage: sendVerificationEmailTemplate(user.name, emailVerificationLink),
       });
     } catch (mailError) {
@@ -110,12 +110,12 @@ export const verifyUser = async (req, res) => {
         },
       );
 
-      const emailVerificationLink = `${process.env.BASE_URL}/api/v1/auth/verifyuser/${newVerificationToken}`;
+      const emailVerificationLink = `${process.env.BASE_URL}/api/v1/auth/verifyUser/${newVerificationToken}`;
 
       await sendMail({
         to: user.email,
         subject: 'New Verification Email - AlgoNinja',
-        message: emailVerificationLink,
+        message: sendVerificationEmailTemplate(user.name, emailVerificationLink),
       });
 
       return res.status(400).json({
@@ -282,7 +282,7 @@ export const forgotPassword = async (req, res) => {
     const resetPasswordToken = crypto.randomBytes(32).toString('hex');
     const resetPasswordExpiry = Date.now() + 10 * 60 * 1000; // 10min
 
-    const resetLink = `${process.env.BASE_URL}/api/v1/auth/resetPassword/${resetPasswordToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetPasswordToken}`;
 
     await User.findOneAndUpdate(
       { email: email },
@@ -295,7 +295,7 @@ export const forgotPassword = async (req, res) => {
     await sendMail({
       to: user.email,
       subject: 'Reset Password Link - AlgoNinjua',
-      message: resetLink,
+      htmlMessage: sendForgotPasswordEmailTemplate(user.name, resetLink),
     });
 
     return res.status(200).json({ message: 'Email sent successfully' });
@@ -333,7 +333,7 @@ export const resetPassword = async (req, res) => {
       const newresetPasswordToken = crypto.randomBytes(32).toString('hex');
       const newresetPasswordExpiry = Date.now() + 10 * 60 * 1000; // 10min
 
-      const resetLink = `${process.env.BASE_URL}/api/v1/auth/resetPassword/${newresetPasswordToken}`;
+      const resetLink = `${process.env.FRONTEND_URL}/reset-password/${newresetPasswordToken}`;
 
       await User.findOneAndUpdate(
         { email: user.email },
@@ -346,7 +346,7 @@ export const resetPassword = async (req, res) => {
       await sendMail({
         to: user.email,
         subject: 'New Reset Password Link - AlgoNinja',
-        message: resetLink,
+        htmlMessage: sendForgotPasswordEmailTemplate(user.name, resetLink),
       });
 
       return res.status(400).json({
