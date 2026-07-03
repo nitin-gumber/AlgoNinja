@@ -11,6 +11,7 @@ import {
   Target,
   Trophy,
 } from "lucide-react";
+
 import { FcGoogle } from "react-icons/fc";
 
 import { NinjaIllustration } from "../components/core/NinjaIllustration";
@@ -57,7 +58,7 @@ export const SignupPage = () => {
   return (
     <>
       <div
-        className="min-h-screen flex flex-col lg:flex-row"
+        className="min-h-screen flex flex-col lg:flex-row pt-10"
         style={{
           background: "#0a0a0a",
           fontFamily: "'Satoshi', sans-serif",

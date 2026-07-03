@@ -2,7 +2,7 @@ import { User } from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { userRoleEnum } from '../utils/constants.js';
+import { planEnum, userRoleEnum } from '../utils/constants.js';
 import { sendMail } from '../utils/sendMail.js';
 import { sendVerificationEmailTemplate } from '../templates/sendVerificationEmailTemplate.js';
 import { sendForgotPasswordEmailTemplate } from '../templates/sendForgotPasswordEmailTemplate.js';
@@ -226,7 +226,8 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        image: user.image,
+        image: user?.image,
+        plan: user?.plan || planEnum.FREE,
       },
     });
   } catch (error) {
@@ -397,6 +398,7 @@ export const check = async (req, res) => {
         email: user.email,
         role: user.role,
         image: user?.image,
+        plan: user?.plan || planEnum.FREE,
       },
     });
   } catch (error) {
