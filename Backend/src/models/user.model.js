@@ -86,7 +86,21 @@ const userSchema = new mongoose.Schema(
         ref: 'Problem',
       },
     ],
+
+    streakCount: {
+      type: Number,
+      default: 0,
+    },
+    highestStreak: {
+      type: Number,
+      default: 0,
+    },
+    lastSolvedDate: {
+      type: Date,
+      default: null,
+    },
   },
+
   {
     timestamps: true,
   },

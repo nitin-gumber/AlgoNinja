@@ -153,22 +153,44 @@ export const submitCode = async (req, res) => {
       testCases: detailedResults,
     });
 
+    let currentStreak = 0;
+    let highestStreak = 0;
+
     if (allPassed) {
-      await User.findByIdAndUpdate(userId, {
-        $addToSet: { solvedProblems: problemId },
-      });
+      const user = await User.findById(userId);
+
+      if (user) {
+        const isProblemUnique = !user.solvedProblems.includes(problemId);
+
+        if (isProblemUnique) {
+          user.solvedProblems.push(problemId);
+
+          const updatedUser = processUserStreak(user);
+          await updatedUser.save();
+
+          currentStreak = updatedUser.streakCount;
+          highestStreak = updatedUser.highestStreak;
+        } else {
+          currentStreak = user.streakCount;
+          highestStreak = user.highestStreak;
+        }
+      }
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: allPassed
-        ? `Congratulation! Problem Solved Successfully,`
+        ? `Congratulations! Problem Solved Successfully.`
         : `Submission processed with errors`,
       submissionId: submission._id,
       status: submission.status,
       runtimeMetrics: {
         memory: submission.memory,
         time: submission.time,
+      },
+      streakMetrics: {
+        streakCount: currentStreak,
+        highestStreak: highestStreak,
       },
       testCases: detailedResults,
     });

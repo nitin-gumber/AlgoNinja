@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, NavLink } from "react-router";
-import { ChevronDown, LogOut, User } from "lucide-react";
-// import Avatar from "boring-avatars";
+import { ChevronDown, LogOut, User, LayoutDashboard } from "lucide-react";
+import Avatar from "boring-avatars";
 import { PlanBadge } from "./PlanBadge";
 
 export const MobileDrawer = ({
@@ -106,9 +106,9 @@ export const MobileDrawer = ({
         <NavLink
           to="/pricing"
           onClick={() => setIsOpen(false)}
-          className={
-            ({isActive}) =>
-            `block p-3 text-base font-medium rounded-xl transition-colors ${isActive ? "bg-muted text-brand font-semibold" : "text-foreground/80 hover:bg-muted/50"}`}
+          className={({ isActive }) =>
+            `block p-3 text-base font-medium rounded-xl transition-colors ${isActive ? "bg-muted text-brand font-semibold" : "text-foreground/80 hover:bg-muted/50"}`
+          }
         >
           Pricing
         </NavLink>
@@ -117,41 +117,50 @@ export const MobileDrawer = ({
 
         {/* Dynamic Auth Section */}
         {isAuthenticated ? (
-          <div className="space-y-4 p-1">
+          <div className="space-y-4 p-1 flex flex-col">
             <div className="flex items-center justify-between p-3 bg-muted/40 rounded-2xl border border-border/40">
               <div className="flex items-center space-x-3">
-                {/* <Avatar
+                <Avatar
                   size={36}
-                  name={user?.name || "Ninja"}
+                  name={authUser?.name || "Ninja"}
                   variant="beam"
                   colors={["#e02020", "#0a0a0a", "#94a3b8"]}
-                /> */}
-                <span className="text-sm font-bold text-foreground truncate max-w-[130px]">
+                />
+                <span className="text-sm font-bold text-foreground truncate max-w-32.5">
                   {authUser?.name}
                 </span>
               </div>
-              {userPlan !== "free" && (
-                <PlanBadge plan={userPlan} isMobile />
-              )}
+              {userPlan !== "free" && <PlanBadge plan={userPlan} isMobile />}
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               <Link
                 to="/profile"
                 onClick={() => setIsOpen(false)}
-                className="p-2.5 text-center text-sm font-semibold bg-muted text-foreground rounded-xl border border-border hover:bg-muted/80"
+                className="flex items-center justify-center gap-2 p-2.5 text-center text-sm font-semibold bg-muted text-foreground rounded-xl border border-border hover:bg-muted/80"
               >
-                My Profile
+                <User className="h-4 w-4 opacity-70" /> My Profile
               </Link>
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  logout();
-                }}
-                className="p-2.5 text-center text-sm font-semibold bg-destructive/10 text-destructive rounded-xl hover:bg-destructive/15"
-              >
-                Log Out
-              </button>
+
+              {authUser?.role === "admin" && (
+                <Link
+                  to="/admin-dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 p-2.5 text-center text-sm font-semibold bg-muted text-foreground rounded-xl border border-border hover:bg-muted/80"
+                >
+                  <LayoutDashboard className="h-4 w-4 opacity-70" /> Admin
+                  Dashboard
+                </Link>
+              )}
             </div>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                logout();
+              }}
+              className="p-2.5 text-center text-sm font-semibold bg-destructive/10 text-destructive rounded-xl hover:bg-destructive/15"
+            >
+              Log Out
+            </button>
           </div>
         ) : (
           <div className="flex flex-col space-y-2.5 pt-2">

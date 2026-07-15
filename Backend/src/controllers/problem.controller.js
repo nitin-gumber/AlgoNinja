@@ -2,9 +2,7 @@ import { User } from '../models/user.model.js';
 import { Problem } from '../models/problem.model.js';
 import { userRoleEnum } from '../utils/constants.js';
 import { getJudge0LanguageId, submitBatch, pollBatchResults } from '../utils/judge0.js';
-
 import mongoose from 'mongoose';
-import { waitForDebugger } from 'inspector';
 
 export const createProblem = async (req, res) => {
   const {
@@ -20,13 +18,6 @@ export const createProblem = async (req, res) => {
     codeSnippets,
     referenceSolutions,
   } = req.body;
-
-  if (req.user.role !== userRoleEnum.ADMIN) {
-    return res.status(403).json({
-      success: false,
-      message: 'Access denied! Only admins can create problems.',
-    });
-  }
 
   try {
     const normailizedTitle = title.trim();
@@ -120,7 +111,7 @@ export const createProblem = async (req, res) => {
 
 export const getAllProblems = async (req, res) => {
   try {
-    const problems = await Problem.find({});
+    const problems = await Problem.find({}).select('-testcases -referenceSolutions');
 
     if (problems.length === 0) {
       return res.status(404).json({
@@ -187,13 +178,6 @@ export const updateProblem = async (req, res) => {
     referenceSolutions,
   } = req.body;
 
-  if (req.user.role !== userRoleEnum.ADMIN) {
-    return res.status(403).json({
-      success: false,
-      message: 'Access denied! You are not allowed to update a problem',
-    });
-  }
-
   try {
     const problem = await Problem.findById(id);
 
@@ -258,7 +242,7 @@ export const updateProblem = async (req, res) => {
         codeSnippets: codeSnippets,
         referenceSolutions: referenceSolutions,
       },
-      { new: true, runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     );
 
     res.status(201).json({
@@ -285,9 +269,9 @@ export const deleteProblem = async (req, res) => {
   }
 
   try {
-    const deleteProblem = await Problem.findByIdAndDelete(id);
+    const deletedProblemNode = await Problem.findByIdAndDelete(id);
 
-    if (!deleteProblem) {
+    if (!deletedProblemNode) {
       return res.status(404).json({
         success: false,
         message: 'Problem not found',

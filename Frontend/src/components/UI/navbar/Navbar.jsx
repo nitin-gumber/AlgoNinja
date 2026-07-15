@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router";
+import Avatar from "boring-avatars";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { MenuDropdown } from "./MenuDropdown";
 import { MobileDrawer } from "./MobileDrawer";
 import { PlanBadge } from "./PlanBadge";
-import Avatar from "boring-avatars";
 
 import {
   LogOut,
@@ -18,7 +18,9 @@ import {
   Layers,
   FileText,
   User,
+  LayoutDashboard,
 } from "lucide-react";
+import { ModeButton } from "../../core/ModeButton";
 
 const discoverItems = [
   {
@@ -61,7 +63,7 @@ export default function Navbar() {
 
   const location = useLocation();
   const { isAuthenticated, authUser, logout } = useAuthStore();
-  const { isDarkMode, toggleTheme } = useThemeStore();
+  const { isDarkMode } = useThemeStore();
 
   useEffect(() => {
     if (isAuthenticated && authUser) {
@@ -154,17 +156,7 @@ export default function Navbar() {
           {/* Desktop Right Action Area */}
           <div className="hidden lg:flex lg:items-center lg:space-x-4">
             {/* Theme Toggle Button */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="p-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground transition-all duration-200 active:scale-95 cursor-pointer focus:outline-none"
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4 text-amber-500 animate-pulse" />
-              ) : (
-                <Moon className="h-4 w-4 text-indigo-500" />
-              )}
-            </button>
+            <ModeButton/>
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-4 pl-3 border-l border-border">
@@ -223,6 +215,22 @@ export default function Navbar() {
                       </Link>
                     </li>
 
+                    {authUser?.role === "admin" && (
+                      <li>
+                        <Link
+                          to="/admin-dashboard"
+                          onClick={() =>
+                            document.activeElement instanceof HTMLElement &&
+                            document.activeElement.blur()
+                          }
+                          className="flex items-center gap-2 w-full text-sm font-medium p-2 rounded-xl text-foreground hover:bg-muted satoshi"
+                        >
+                          <LayoutDashboard className="h-4 w-4 opacity-70" />{" "}
+                          Admin Dashboard
+                        </Link>
+                      </li>
+                    )}
+
                     <div className="bg-border/60 h-px my-1" />
 
                     <li>
@@ -234,7 +242,7 @@ export default function Navbar() {
                         }}
                         className="p-2.5 font-semibold text-sm text-destructive hover:bg-destructive/10 rounded-xl flex items-center justify-between"
                       >
-                        <span>Sign Out</span>
+                        <span>Log Out</span>
                         <LogOut className="h-4 w-4" />
                       </button>
                     </li>
@@ -261,17 +269,7 @@ export default function Navbar() {
 
           {/* Hamburger Mobile Menu Toggle Button */}
           <div className="flex items-center space-x-3 lg:hidden">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="p-2 rounded-xl border border-border/80 bg-card hover:bg-muted text-foreground transition-all duration-200 active:scale-95 cursor-pointer focus:outline-none"
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4 text-amber-500 animate-pulse" />
-              ) : (
-                <Moon className="h-4 w-4 text-indigo-500" />
-              )}
-            </button>
+           <ModeButton/>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-xl text-foreground bg-card border border-border hover:bg-muted transition-all duration-200 active:scale-95 focus:outline-none cursor-pointer"
