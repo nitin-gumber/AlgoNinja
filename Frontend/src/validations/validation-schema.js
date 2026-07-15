@@ -75,3 +75,45 @@ export const resetPasswordSchema = z
     message: "Passwords do not match.",
     path: ["confirmPassword"],
   });
+
+export const problemValidationSchema = z.object({
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be at most 100 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  difficulty: z.enum(["easy", "medium", "hard"]),
+  tags: z
+    .array(z.string().min(1, "Tag cannot be empty"))
+    .min(1, "At least one tag is required"),
+  examples: z
+    .array(
+      z.object({
+        input: z.string().min(1, "Example input is required"),
+        output: z.string().min(1, "Example output is required"),
+        explanation: z.string().optional(),
+      }),
+    )
+    .min(1, "At least one code example model is required"),
+  constraints: z.string().min(1, "Constraints are required"),
+  hints: z.string().optional(),
+  editorial: z.string().optional(),
+  testcases: z
+    .array(
+      z.object({
+        input: z.string().min(1, "Testcase input is required"),
+        output: z.string().min(1, "Testcase output is required"),
+      }),
+    )
+    .min(1, "At least one testcase is required"),
+  codeSnippets: z.object({
+    JAVASCRIPT: z.string().min(1, "JavaScript snippet is required"),
+    PYTHON: z.string().min(1, "Python snippet is required"),
+    JAVA: z.string().min(1, "Java snippet is required"),
+  }),
+  referenceSolutions: z.object({
+    JAVASCRIPT: z.string().min(1, "JavaScript solution is required"),
+    PYTHON: z.string().min(1, "Python solution is required"),
+    JAVA: z.string().min(1, "Java solution is required"),
+  }),
+});

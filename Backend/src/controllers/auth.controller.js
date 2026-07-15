@@ -176,6 +176,15 @@ export const login = async (req, res) => {
       });
     }
 
+    if (user.lastSolvedDate) {
+      const today = dayjs().startOf('day');
+      const lastSolved = dayjs(user.lastSolvedDate).startOf('day');
+      
+      if (today.diff(lastSolved, 'day') > 1) {
+        user.streakCount = 0;
+      }
+    }
+
     const accessToken = jwt.sign(
       {
         id: user._id,
@@ -228,6 +237,8 @@ export const login = async (req, res) => {
         role: user.role,
         image: user?.image,
         plan: user?.plan || planEnum.FREE,
+        streakCount: user?.streakCount || 0,
+        highestStreak: user?.highestStreak || 0,
       },
     });
   } catch (error) {
@@ -390,6 +401,17 @@ export const check = async (req, res) => {
         message: 'User not found',
       });
     }
+
+    if (user.lastSolvedDate) {
+      const today = dayjs().startOf('day');
+      const lastSolved = dayjs(user.lastSolvedDate).startOf('day');
+      
+      if (today.diff(lastSolved, 'day') > 1) {
+        user.streakCount = 0;
+        await user.save();
+      }
+    }
+
     res.status(200).json({
       success: true,
       user: {
@@ -399,6 +421,8 @@ export const check = async (req, res) => {
         role: user.role,
         image: user?.image,
         plan: user?.plan || planEnum.FREE,
+        streakCount: user?.streakCount || 0,
+        highestStreak: user?.highestStreak || 0,
       },
     });
   } catch (error) {
@@ -416,6 +440,15 @@ export const googleCallback = async (req, res) => {
 
     if (!user) {
       return res.redirect(`${process.env.FRONTEND_URL}/login?error=unauthorized`);
+    }
+
+    if (user.lastSolvedDate) {
+      const today = dayjs().startOf('day');
+      const lastSolved = dayjs(user.lastSolvedDate).startOf('day');
+      
+      if (today.diff(lastSolved, 'day') > 1) {
+        user.streakCount = 0;
+      }
     }
 
     const accessToken = jwt.sign(

@@ -9,7 +9,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useThemeStore } from "../store/useThemeStore";
 
 export const ForgotPasswordPage = () => {
-  const { isProcessingAction, sendPasswordResetEmail } = useAuthStore();
+  const { isProcessingAction, forgotPassword } = useAuthStore();
   const { isDarkMode } = useThemeStore();
 
   const {
@@ -23,8 +23,8 @@ export const ForgotPasswordPage = () => {
     },
   });
 
-  const onSubmit = async ({ email }) => {
-    await sendPasswordResetEmail(email);
+  const onSubmit = async (email ) => {
+    await forgotPassword(email);
   };
 
   return (

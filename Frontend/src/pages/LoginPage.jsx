@@ -96,7 +96,7 @@ export const LoginPage = () => {
                   type="email"
                   placeholder="xyz@gmail.com"
                   autoComplete="email"
-                  className={`w-full h-11 px-4 rounded-xl text-sm bg-card text-foreground placeholder-foreground/20 outline-none transition-all duration-150 border focus:border-transparent ${
+                  className={`w-full h-11 px-4 rounded-xl text-sm text-foreground placeholder-foreground/20 outline-none transition-all duration-150 border focus:border-transparent ${
                     errors.email
                       ? "border-destructive bg-destructive/5 focus:ring-2 focus:ring-destructive"
                       : "border-border hover:bg-muted/10 focus:bg-muted/10 focus:ring-2 focus:ring-brand"
@@ -134,8 +134,8 @@ export const LoginPage = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className={`w-full h-11 pl-4 pr-12 rounded-xl text-sm bg-card text-foreground placeholder-foreground/20 outline-none transition-all duration-150 border focus:border-transparent ${
-                      errors.password
+                    className={`w-full h-11 px-4 rounded-xl text-sm text-foreground placeholder-foreground/20 outline-none transition-all duration-150 border focus:border-transparent ${
+                      errors.email
                         ? "border-destructive bg-destructive/5 focus:ring-2 focus:ring-destructive"
                         : "border-border hover:bg-muted/10 focus:bg-muted/10 focus:ring-2 focus:ring-brand"
                     }`}

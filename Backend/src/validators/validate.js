@@ -75,14 +75,15 @@ export const userresetPasswordValidator = () => {
 
 export const createProblemValidator = () => {
   return [
-    body('title').trim().notEmpty().withMessage('Title is required'),
-    body('description').trim().notEmpty().withMessage('Description is required'),
-    body('difficulty').trim().notEmpty().withMessage('Difficulty is required'),
-    body('tags').isArray().withMessage('Tags must be an array of strings'),
-    body('examples').notEmpty().withMessage('Examples are required'),
+    body('title').trim().notEmpty().withMessage('Title is required').isLength({ min: 3, max: 100 }),
+    body('description').trim().notEmpty().withMessage('Description is required').isLength({ min: 10 }),
+    body('difficulty').trim().toLowerCase().isIn(['easy', 'medium', 'hard']).withMessage('Invalid difficulty level'),
+    body('tags').isArray({ min: 1 }).withMessage('Tags must be an array with at least one element'),
+    body('examples').isObject().notEmpty().withMessage('Examples structured object framework is required'),
     body('constraints').trim().notEmpty().withMessage('Constraints are required'),
-    body('testcases').notEmpty().withMessage('Testcases are required'),
-    body('codeSnippets').notEmpty().withMessage('Code snippets are required'),
+    body('testcases').isArray({ min: 1 }).withMessage('At least one functional execution testcase array is required'),
+    body('codeSnippets').isObject().notEmpty().withMessage('Code snippets map matrix is required'),
+    body('referenceSolutions').isObject().notEmpty().withMessage('Reference solutions verification models are required'),
   ];
 };
 
