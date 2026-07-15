@@ -193,7 +193,7 @@ export const UpdateProblemPage = () => {
         {/* Page Main Header */}
         <div className="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/20 pb-6">
           <div className="space-y-1">
-            <h1 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2.5">
+            <h1 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2.5 arp-display">
               <FileEdit className="h-6 w-6 text-brand" />
               <span>Update problem</span>
             </h1>
