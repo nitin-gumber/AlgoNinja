@@ -8,7 +8,7 @@ export const ProtectedRoute = ({ isAuthenticated }) => {
 
 export const AdminGuard = ({ isAuthenticated, user }) => {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (user?.role !== "admin") return <Navigate to="/" replace />;
+  if (user?.role?.toLowerCase() !== "admin") return <Navigate to="/" replace />;
   return <Outlet />;
 };
 

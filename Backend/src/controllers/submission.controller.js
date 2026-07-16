@@ -36,7 +36,7 @@ export const getAllUserSubmissions = async (req, res) => {
           language: 1,
           memory: 1,
           time: 1,
-          createdAT: 1,
+          createdAt: 1,
           problem: {
             title: {
               $ifNull: [`$problemDetails.title`, `Deleted Problem`],

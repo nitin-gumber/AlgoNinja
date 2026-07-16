@@ -2,6 +2,7 @@ import { User } from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
 import { planEnum, userRoleEnum } from '../utils/constants.js';
 import { sendMail } from '../utils/sendMail.js';
 import { sendVerificationEmailTemplate } from '../templates/sendVerificationEmailTemplate.js';
