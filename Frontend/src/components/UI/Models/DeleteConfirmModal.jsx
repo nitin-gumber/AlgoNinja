@@ -10,7 +10,6 @@ export const DeleteConfirmModal = ({ problemId, onClose, isDarkMode }) => {
     if (!problemId) return;
     try {
       setIsEvicting(true);
-      // Calls your active problem store action sequence
       await deleteProblem(problemId);
       onClose();
     } catch (err) {

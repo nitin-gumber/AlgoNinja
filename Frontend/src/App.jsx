@@ -1,11 +1,15 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route, Navigate, useLocation } from "react-router";
 import { useThemeStore } from "./store/useThemeStore";
 import { useAuthStore } from "./store/useAuthStore";
 
 import Navbar from "./components/UI/navbar/Navbar";
 import { Spinner } from "./components/Spinner";
-import { AdminGuard, PublicRoute } from "./components/core/ProtectedRoute";
+import {
+  AdminGuard,
+  PublicRoute,
+  ProtectedRoute,
+} from "./components/core/ProtectedRoute";
 
 import { Home } from "./pages/Home";
 import { LoginPage } from "./pages/LoginPage";
@@ -15,8 +19,12 @@ import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { AddProblemPage } from "./pages/AddProblemPage";
 import { UpdateProblemPage } from "./pages/UpdateProblemPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 export const App = () => {
+
+  const location = useLocation()
+
   const { initTheme } = useThemeStore();
   const { authUser, isCheckAuth, isAuthenticated, checkAuth } = useAuthStore();
 
@@ -35,7 +43,7 @@ export const App = () => {
 
   return (
     <>
-      <Navbar />
+    {location.pathname !== '/profile' && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
 
@@ -47,6 +55,11 @@ export const App = () => {
             path="/reset-password/:token"
             element={<ResetPasswordPage />}
           />
+        </Route>
+
+        {/* ── Protected Regular User Authorized Zones ── */}
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         {/* Admin Authorized Zones */}

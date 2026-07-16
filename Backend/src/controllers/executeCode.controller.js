@@ -7,6 +7,8 @@ import {
   getJudge0LanguageName,
 } from '../utils/judge0.js';
 
+import { processUserStreak } from '../utils/streakEngine.js';
+// processUserStreak
 const evaluatedCode = async ({ source_code, language_id, stdin, expected_outputs }) => {
   if (
     !Array.isArray(stdin) ||
